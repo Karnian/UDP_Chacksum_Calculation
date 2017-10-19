@@ -109,33 +109,18 @@ int main()
 	scanf("%d", &UDP.DPN);
 	// input PL
 	printf("udp payload : ");
-	scanf("%s", UDP.PL);
+	fgets(UDP.PL, 100, stdin);
+
 
 	tokking(UDP.SIA, UDP.DIA);
 
 	u16 buff[200];
 
-	if (UDP.SPN > 255)
-	{
-		buff[0] = (UDP.SPN - 255) % 255;
-		buff[1] = UDP.SPN % 255;
-	}
-	else
-	{
-		buff[0] = 0;
-		buff[1] = UDP.SPN;
-	}
 
-	if (UDP.DPN > 255)
-	{
-		buff[3] = (UDP.DPN - 255) % 255;
-		buff[4] = UDP.DPN % 255;
-	}
-	else
-	{
-		buff[3] = 0;
-		buff[4] = UDP.DPN;
-	}
+	buff[0] = (UDP.SPN >> 8) & 0xFF;
+	buff[1] = (UDP.SPN) & 0x00FF;
+	buff[3] = (UDP.DPN >> 8) & 0xFF;
+	buff[4] = (UDP.DPN) & 0x00FF;
 
 	buff[6] = 0;
 	buff[7] = 0;
@@ -150,5 +135,6 @@ int main()
 
 	buff[5] = len_udp;
 
-	printf("%d\n", udp_sum_calc(len_udp, SIA, DIA, len_udp % 2, buff));
+
+	printf("%hd\n", udp_sum_calc(len_udp, SIA, DIA, len_udp % 2, buff));
 }
