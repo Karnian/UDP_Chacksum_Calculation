@@ -107,6 +107,10 @@ int main()
 	// input DPN
 	printf("destination port number : ");
 	scanf("%d", &UDP.DPN);
+
+	char nullbuff;
+	scanf("%c", &nullbuff);
+
 	// input PL
 	printf("udp payload : ");
 	fgets(UDP.PL, 100, stdin);
