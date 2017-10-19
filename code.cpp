@@ -71,17 +71,13 @@ u16 udp_sum_calc(u16 len_udp, u16 src_addr[], u16 dest_addr[], bool padding, u16
 
 	// make 16 bit words out of every two adjacent 8 bit words and 
 	// calculate the sum of all 16 vit words
-	for (int i = 0; i<len_udp + padd; i = i + 2) {
+	for (int i = 0; i < len_udp + padd; i = i + 2) {
 		word16 = ((buff[i] << 8) & 0xFF00) + (buff[i + 1] & 0xFF);
 		sum = sum + (unsigned long)word16;
 	}
 	// add the UDP pseudo header which contains the IP source and destinationn addresses
-	for (int i = 0; i<4; i = i + 2) {
+	for (int i = 0; i < 4; i = i + 2) {
 		word16 = ((src_addr[i] << 8) & 0xFF00) + (src_addr[i + 1] & 0xFF);
-		sum = sum + word16;
-	}
-	for (int i = 0; i<4; i = i + 2) {
-		word16 = ((dest_addr[i] << 8) & 0xFF00) + (dest_addr[i + 1] & 0xFF);
 		sum = sum + word16;
 	}
 	// the protocol number and the length of the UDP packet
@@ -107,10 +103,10 @@ int main()
 	scanf("%s", UDP.DIA);
 	// input SPN
 	printf("source port number : ");
-	scanf("%d", UDP.SPN);
+	scanf("%d", &UDP.SPN);
 	// input DPN
 	printf("destination port number : ");
-	scanf("%d", UDP.DPN);
+	scanf("%d", &UDP.DPN);
 	// input PL
 	printf("udp payload : ");
 	scanf("%s", UDP.PL);
@@ -119,6 +115,32 @@ int main()
 
 	u16 buff[200];
 
+	if (UDP.SPN > 255)
+	{
+		buff[0] = (UDP.SPN - 255) % 255;
+		buff[1] = UDP.SPN % 255;
+	}
+	else
+	{
+		buff[0] = 0;
+		buff[1] = UDP.SPN;
+	}
+
+	if (UDP.DPN > 255)
+	{
+		buff[3] = (UDP.DPN - 255) % 255;
+		buff[4] = UDP.DPN % 255;
+	}
+	else
+	{
+		buff[3] = 0;
+		buff[4] = UDP.DPN;
+	}
+
+	buff[6] = 0;
+	buff[7] = 0;
+
+
 	for (int i = 0; i < strlen(UDP.PL); i++)
 	{
 		buff[8 + i] = UDP.PL[i];
@@ -126,5 +148,7 @@ int main()
 
 	u16 len_udp = 8 + strlen(UDP.PL);
 
-	printf("%d\n", udp_sum_calc(len_udp, SIA, DIA, strlen(UDP.PL) % 2, buff));
+	buff[5] = len_udp;
+
+	printf("%d\n", udp_sum_calc(len_udp, SIA, DIA, len_udp % 2, buff));
 }
