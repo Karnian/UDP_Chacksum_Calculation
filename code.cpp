@@ -7,11 +7,11 @@ typedef unsigned long u32;
 
 struct UDP
 {
-	char SIA[20];
-	char DIA[20];
-	int SPN;
-	int DPN;
-	char PL[100];
+	char SIA[20] = "172.30.1.17";
+	char DIA[20] = "210.107.197.252";
+	int SPN = 2443;
+	int DPN = 80;
+	char PL[100] = "MMcN Lab.";
 }UDP;
 
 u16 SIA[5] = { 0 };
@@ -95,7 +95,7 @@ u16 udp_sum_calc(u16 len_udp, u16 src_addr[], u16 dest_addr[], bool padding, u16
 
 int main()
 {
-	// input SIA
+/*	// input SIA
 	printf("source IP address : ");
 	scanf("%s", UDP.SIA);
 	// input DIA
@@ -114,7 +114,7 @@ int main()
 	// input PL
 	printf("udp payload : ");
 	fgets(UDP.PL, 100, stdin);
-
+	*/
 
 	tokking(UDP.SIA, UDP.DIA);
 
@@ -140,5 +140,5 @@ int main()
 	buff[5] = len_udp;
 
 
-	printf("%hd\n", udp_sum_calc(len_udp, SIA, DIA, len_udp % 2, buff));
+	printf("checksum : %hd\n", udp_sum_calc(len_udp, SIA, DIA, len_udp % 2, buff));
 }
