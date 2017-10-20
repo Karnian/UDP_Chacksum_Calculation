@@ -52,7 +52,7 @@ void tokking(char SIP[], char DIP[])
 }
 
 
-u16 udp_sum_calc(u16 len_udp, u16 src_addr[], u16 dest_addr[], bool padding, u16 buff[])
+u16 udp_sum_calc(u16 len_udp, u16 src_addr[], u16 dest_addr[], int padding, u16 buff[])
 {
 	u16 prot_udp = 17;
 	u16 padd = 0;
@@ -61,7 +61,7 @@ u16 udp_sum_calc(u16 len_udp, u16 src_addr[], u16 dest_addr[], bool padding, u16
 
 	// Find out if the length of data is even or odd number. If odd,
 	// add a padding byte = 0 at the end of packet
-	if (padding & 1 == 1) {
+	if (padding) {
 		padd = 1;
 		buff[len_udp] = 0;
 	}
@@ -78,7 +78,7 @@ u16 udp_sum_calc(u16 len_udp, u16 src_addr[], u16 dest_addr[], bool padding, u16
 	// add the UDP pseudo header which contains the IP source and destinationn addresses
 	for (int i = 0; i < 4; i = i + 2) {
 		word16 = ((src_addr[i] << 8) & 0xFF00) + (src_addr[i + 1] & 0xFF);
-		sum = sum + word16;
+		sum = sum + (unsigned long)word16;
 	}
 	// the protocol number and the length of the UDP packet
 	sum = sum + prot_udp + len_udp;
@@ -117,18 +117,29 @@ int main()
 	*/
 
 	tokking(UDP.SIA, UDP.DIA);
+/*
+	for (int i = 0; i < 4; i++)
+		printf("%d ", SIA[i]);
+	printf("\n");
 
+	for (int i = 0; i < 4; i++)
+		printf("%d ", DIA[i]);
+	printf("\n");
+	*/
 	u16 buff[200];
 
 
 	buff[0] = (UDP.SPN >> 8) & 0xFF;
 	buff[1] = (UDP.SPN) & 0x00FF;
-	buff[3] = (UDP.DPN >> 8) & 0xFF;
-	buff[4] = (UDP.DPN) & 0x00FF;
-
+	buff[2] = (UDP.DPN >> 8) & 0xFF;
+	buff[3] = (UDP.DPN) & 0x00FF;
+	/*
+	for (int i = 0; i < 4; i++)
+		printf("%hd ", buff[i]);
+	printf("\n");
+	*/
 	buff[6] = 0;
 	buff[7] = 0;
-
 
 	for (int i = 0; i < strlen(UDP.PL); i++)
 	{
@@ -137,8 +148,17 @@ int main()
 
 	u16 len_udp = 8 + strlen(UDP.PL);
 
-	buff[5] = len_udp;
+	buff[4] = (len_udp >> 8) & 0xFF;
+	buff[5] = (len_udp) & 0x00FF;
 
+	/*
+	for (int i = 0; i < len_udp; i++)
+	{
+		printf("%hd ", buff[i]);
+		if ((i % 2))
+			printf("\n");
+	}
+	*/
 
-	printf("checksum : %hd\n", udp_sum_calc(len_udp, SIA, DIA, len_udp % 2, buff));
+	printf("checksum : %hd\n", udp_sum_calc(len_udp, SIA, DIA, len_udp & 0x01, buff));
 }
