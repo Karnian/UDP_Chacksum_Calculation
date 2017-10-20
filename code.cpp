@@ -76,9 +76,13 @@ u16 udp_sum_calc(u16 len_udp, u16 src_addr[], u16 dest_addr[], int padding, u16 
 		sum = sum + (unsigned long)word16;
 	}
 	// add the UDP pseudo header which contains the IP source and destinationn addresses
-	for (int i = 0; i < 4; i = i + 2) {
+	for (int i = 0; i<4; i = i + 2) {
 		word16 = ((src_addr[i] << 8) & 0xFF00) + (src_addr[i + 1] & 0xFF);
-		sum = sum + (unsigned long)word16;
+		sum = sum + word16;
+	}
+	for (int i = 0; i<4; i = i + 2) {
+		word16 = ((dest_addr[i] << 8) & 0xFF00) + (dest_addr[i + 1] & 0xFF);
+		sum = sum + word16;
 	}
 	// the protocol number and the length of the UDP packet
 	sum = sum + prot_udp + len_udp;
