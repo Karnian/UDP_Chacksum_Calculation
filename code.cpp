@@ -99,26 +99,25 @@ u16 udp_sum_calc(u16 len_udp, u16 src_addr[], u16 dest_addr[], int padding, u16 
 
 int main()
 {
-/*	// input SIA
-	printf("source IP address : ");
-	scanf("%s", UDP.SIA);
+	// input SIA
+	printf("source IP address : %s\n", UDP.SIA);
+//	scanf("%s", UDP.SIA);
 	// input DIA
-	printf("destination IP address : ");
-	scanf("%s", UDP.DIA);
+	printf("destination IP address : %s\n", UDP.DIA);
+//	scanf("%s", UDP.DIA);
 	// input SPN
-	printf("source port number : ");
-	scanf("%d", &UDP.SPN);
+	printf("source port number : %d\n", UDP.SPN);
+//	scanf("%d", &UDP.SPN);
 	// input DPN
-	printf("destination port number : ");
-	scanf("%d", &UDP.DPN);
+	printf("destination port number : %d\n", UDP.DPN);
+//	scanf("%d", &UDP.DPN);
 
 	char nullbuff;
-	scanf("%c", &nullbuff);
+//	scanf("%c", &nullbuff);
 
 	// input PL
-	printf("udp payload : ");
-	fgets(UDP.PL, 100, stdin);
-	*/
+	printf("udp payload : %s\n", UDP.PL);
+//	fgets(UDP.PL, 100, stdin);
 
 	tokking(UDP.SIA, UDP.DIA);
 /*
@@ -163,6 +162,12 @@ int main()
 			printf("\n");
 	}
 	*/
+	u16 checksum = udp_sum_calc(len_udp, SIA, DIA, len_udp & 0x01, buff);
 
-	printf("checksum : %hd\n", udp_sum_calc(len_udp, SIA, DIA, len_udp & 0x01, buff));
+	buff[6] = (checksum >> 8) & 0xFF;
+	buff[7] = (checksum) & 0x00FF;
+
+	u16 result = udp_sum_calc(len_udp, SIA, DIA, 0, buff);
+
+	printf("checksum : %hd\nresult : %hd\n", checksum, result);
 }
